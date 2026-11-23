@@ -169,7 +169,10 @@ def sdk_dir(version):
 
 def valid_sdk(path):
     path = Path(path)
-    return (path / "lib" / "libchen.so").is_file() and (path / "include" / "chen").is_dir()
+    include = path / "include"
+    # 历史 SDK 用小写 include/chen，新版统一为 include/Chen；Linux 区分大小写，两者都要兼容
+    has_headers = (include / "Chen").is_dir() or (include / "chen").is_dir()
+    return (path / "lib" / "libchen.so").is_file() and has_headers
 
 
 def parse_version_dir(path):
@@ -324,7 +327,7 @@ def install_zip(zip_path, version, ui):
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     if not valid_sdk(dest):
-        raise DepsError(f"安装后校验失败：{dest.name} 缺少 lib/libchen.so 或 include/chen")
+        raise DepsError(f"安装后校验失败：{dest.name} 缺少 lib/libchen.so 或 include/Chen")
     ensure_bin_executable(dest)
 
 
