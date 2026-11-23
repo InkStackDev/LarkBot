@@ -11,8 +11,8 @@
 #include <sstream>
 #include <string>
 
-#include <chen/config/config.h>
-#include <chen/util/json_util.h>
+#include <Chen/Config/Config.hpp>
+#include <Chen/Util/JsonUtil.hpp>
 
 namespace bot {
 

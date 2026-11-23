@@ -3,7 +3,7 @@
 
 # Servers Configuration, defining the HTTP and WebSocket servers with their respective settings.
 servers:
-  - address: ["0.0.0.0:8090"]
+  - address: [ "0.0.0.0:8093" ]
     keepalive: 1
     timeout: 1000
     name: chen-http/1.0.0

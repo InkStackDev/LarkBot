@@ -1,6 +1,6 @@
 #include "Struct.hpp"
 
-#include <chen/util/util.h>
+#include <Chen/Util/Util.hpp>
 
 #include <ctime>
 

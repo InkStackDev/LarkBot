@@ -1,8 +1,8 @@
 #include "Utils.hpp"
 
-#include <chen/http/http_connection.h>
-#include <chen/http/uri.h>
-#include <chen/util/string_util.h>
+#include <Chen/Http/HttpConnection.hpp>
+#include <Chen/Http/Uri.hpp>
+#include <Chen/Util/StringUtil.hpp>
 
 #include <cctype>
 

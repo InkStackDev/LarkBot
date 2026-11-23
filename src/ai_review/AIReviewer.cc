@@ -3,11 +3,11 @@
 #include "../ai/AIProvider.hpp"
 #include "../Utils.hpp"
 
-#include <chen/http/http_client.h>
-#include <chen/iomanager/iomanager.h>
-#include <chen/log/log.h>
-#include <chen/util/encryptor_util.h>
-#include <chen/util/util.h>
+#include <Chen/Http/HttpClient.hpp>
+#include <Chen/IOManager/IOManager.hpp>
+#include <Chen/Log/Log.hpp>
+#include <Chen/Util/EncryptorUtil.hpp>
+#include <Chen/Util/Util.hpp>
 
 #include <sstream>
 

@@ -1,5 +1,5 @@
-#include <chen/application.h>
-#include <chen/log/log.h>
+#include <Chen/Application.hpp>
+#include <Chen/Log/Log.hpp>
 
 static chen::Logger::ptr logger = LOG_NAME("bot");
 
