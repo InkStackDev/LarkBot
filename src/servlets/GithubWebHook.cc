@@ -1,14 +1,15 @@
 #include "GithubWebHook.hpp"
 
-#include <chen/config/config.h>
-#include <chen/http/http_connection.h>
-#include <chen/log/log.h>
-#include <chen/rpc/rpc_client_pool.h>
+#include <Chen/Config/Config.hpp>
+#include <Chen/Http/HttpConnection.hpp>
+#include <Chen/Log/Log.hpp>
+#include <Chen/Rpc/RpcClient.hpp>
 
 #include <sstream>
 
 #include "../Struct.hpp"
 #include "../Utils.hpp"
+#include "../rpc/HubClient.hpp"
 #include "../ai_review/AIReviewer.hpp"
 #include "../feishu/FeishuBotManager.hpp"
 #include "../protocol/LarkCardProtocol.hpp"
@@ -17,8 +18,6 @@
 namespace bot {
 
 static chen::Logger::ptr logger = LOG_NAME("bot");
-
-static chen::ConfigVar<std::string>::ptr g_blog_rpc_address = chen::Config::Lookup<std::string>("rpc_address.blog", "", "blog 后端 RPC 地址");
 
 static chen::ConfigVar<std::string>::ptr g_rd_bot = chen::Config::Lookup<std::string>("rd.notify_bot", "", "rd 平台机器人 名称");
 
@@ -63,20 +62,24 @@ static std::string ReviewInfoToString(const tagGithubPRReviewInfo& info)
     return oss.str();
 }
 
-/// 异步转发 PR 数据到 blog 后端
+/// 异步转发 PR 数据到 blog 后端（经 hub 的 GROUPID 路由）
 static void ForwardPRToBlog(const tagGithubPRInfo& info)
 {
-    std::string addr = g_blog_rpc_address->getValue();
-    if (addr.empty()) {
-        ERROR(logger) << "blog.rpc_address not configured, skip forwarding PR #" << info.Number;
+    auto client = HubClient::Get();
+    if (!client) {
+        WARN(logger) << "rpc hub unavailable, skip forwarding PR #" << info.Number;
         return;
     }
-    try {
-        auto client = chen::rpc::RpcClientPoolMgr::GetInstance()->getClient(addr);
-        ASSERT_RET(client);
 
-        client->callAsync<int32_t>(
-            SS_CMD_GET_GITHUB_PR_INFO,
+    chen::rpc::RpcRouting routing;
+    routing.method = chen::rpc::RoutingMethod::GROUPID;
+    routing.func_id = HubClient::AppFuncId();
+    routing.group_id = static_cast<uint32_t>(info.Number);
+    routing.real_random = true;
+
+    try {
+        client->callRoutedAsync<int32_t>(
+            routing, SS_CMD_GET_GITHUB_PR_INFO,
             [info](chen::rpc::RpcResult<int32_t> result) {
                 if (!result.ok()) {
                     ERROR(logger) << "ForwardPRToBlog: PR #" << info.Number << " RPC call failed: status=" << chen::rpc::StatusToString(result.status)
@@ -115,20 +118,24 @@ static void ForwardPRToBlog(const tagGithubPRInfo& info)
     }
 }
 
-/// 异步转发 PR Review 数据到 blog 后端
+/// 异步转发 PR Review 数据到 blog 后端（经 hub 的 GROUPID 路由）
 static void ForwardPRReviewToBlog(const tagGithubPRReviewInfo& info)
 {
-    std::string addr = g_blog_rpc_address->getValue();
-    if (addr.empty()) {
-        ERROR(logger) << "blog.rpc_address not configured, skip forwarding review";
+    auto client = HubClient::Get();
+    if (!client) {
+        WARN(logger) << "rpc hub unavailable, skip forwarding PR review #" << info.PRNumber;
         return;
     }
-    try {
-        auto client = chen::rpc::RpcClientPoolMgr::GetInstance()->getClient(addr);
-        ASSERT_RET(client);
 
-        client->callAsync<int32_t>(
-            SS_CMD_GET_GITHUB_PR_REVIEW_INFO,
+    chen::rpc::RpcRouting routing;
+    routing.method = chen::rpc::RoutingMethod::GROUPID;
+    routing.func_id = HubClient::AppFuncId();
+    routing.group_id = static_cast<uint32_t>(info.PRNumber);
+    routing.real_random = true;
+
+    try {
+        client->callRoutedAsync<int32_t>(
+            routing, SS_CMD_GET_GITHUB_PR_REVIEW_INFO,
             [info](chen::rpc::RpcResult<int32_t> result) {
                 if (!result.ok()) {
                     ERROR(logger) << "ForwardPRReviewToBlog: PR #" << info.PRNumber

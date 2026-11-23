@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include <chen/http/http_server.h>
-#include <chen/module/module.h>
+#include <Chen/Http/HttpServer.hpp>
+#include <Chen/Module/Module.hpp>
 
 namespace bot {
 

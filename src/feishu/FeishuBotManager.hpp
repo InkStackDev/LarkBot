@@ -7,9 +7,9 @@
  */
 #pragma once
 
-#include <chen/config/config.h>
-#include <chen/util/json_util.h>
-#include <chen/util/singleton.h>
+#include <Chen/Config/Config.hpp>
+#include <Chen/Util/JsonUtil.hpp>
+#include <Chen/Util/Singleton.hpp>
 
 #include <memory>
 #include <sstream>

@@ -1,10 +1,10 @@
 #include "BotModule.h"
 
-#include <chen/application.h>
-#include <chen/log/log.h>
+#include <Chen/Log/Log.hpp>
 
 #include <memory>
 
+#include "./rpc/HubClient.hpp"
 #include "./servlets/GithubWebHook.hpp"
 #include "./tasks/MealReminder.hpp"
 
@@ -39,6 +39,7 @@ bool BotModule::onUnload()
     INFO(logger) << "onUnload";
 
     MealReminderMgr::GetInstance()->stop();
+    HubClient::Shutdown();
 
     return true;
 }
@@ -52,6 +53,7 @@ bool BotModule::onServerReady()
 
     if (!servers.empty()) {
         registerServlets(servers);
+        HubClient::Init();
     } else {
         ERROR(logger) << "http_server not open";
         return false;
@@ -74,18 +76,19 @@ bool BotModule::onDeactivate()
     INFO(logger) << "onDeactivate";
 
     MealReminderMgr::GetInstance()->stop();
+    HubClient::Shutdown();
 
     return true;
 }
 
 void BotModule::onTick()
 {
-    INFO(logger) << "onTick";
+    HubClient::Tick();
 }
 
 uint64_t BotModule::getTickIntervalMs()
 {
-    return 0;
+    return 5000;
 }
 
 void BotModule::registerServlets(std::vector<chen::http::HttpServer::ptr>& servers)

@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include <chen/timer/timer.h>
-#include <chen/util/singleton.h>
+#include <Chen/Timer/Timer.hpp>
+#include <Chen/Util/Singleton.hpp>
 
 #include <atomic>
 

@@ -10,8 +10,8 @@
 #include <map>
 #include <shared_mutex>
 
-#include <chen/util/json_util.h>
-#include <chen/util/singleton.h>
+#include <Chen/Util/JsonUtil.hpp>
+#include <Chen/Util/Singleton.hpp>
 
 namespace bot {
 
